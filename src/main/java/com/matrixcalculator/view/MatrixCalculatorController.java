@@ -126,9 +126,15 @@ public class MatrixCalculatorController {
             MatrixOperations remote = getRemoteMatrixOperations();
             if (remote != null) {
                 statusLabel.setText("Connected to remote matrix calculation service");
+            } else {
+                showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
+                statusLabel.setText("Error: Remote server unavailable. Please start the server.");
+                return;
             }
         } catch (Exception e) {
-            statusLabel.setText("Warning: Remote service unavailable. Will use local calculations.");
+            showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
+            statusLabel.setText("Error: Remote server unavailable. Please start the server.");
+            return;
         }
 
         String operation = operationComboBox.getValue();
@@ -192,6 +198,10 @@ public class MatrixCalculatorController {
                     return;
                 }
                 double det = calculateDeterminant(matrixA);
+                if (Double.isNaN(det)) {
+                    // Error already shown by calculateDeterminant
+                    return;
+                }
                 showAlert("Determinant Result", "Determinant of Matrix A = " + det);
                 statusLabel.setText("Determinant of Matrix A = " + det);
                 return;
@@ -202,7 +212,7 @@ public class MatrixCalculatorController {
                 }
                 result = calculateInverse(matrixA);
                 if (result == null) {
-                    showAlert("Calculation Error", "The matrix is singular and cannot be inverted.");
+                    // Error message already shown by calculateInverse
                     return;
                 }
                 break;
@@ -215,6 +225,9 @@ public class MatrixCalculatorController {
         if (result != null) {
             displayResult(result);
             statusLabel.setText("Calculation completed successfully.");
+        } else {
+            // Error message already shown by the operation method
+            statusLabel.setText("Calculation failed. Please check if the server is running.");
         }
     }
 
@@ -247,30 +260,17 @@ public class MatrixCalculatorController {
                 statusLabel.setText("Sending matrices to remote server for addition...");
                 return remote.addMatrices(a, b);
             } else {
-                // Fallback to local calculation if remote service is unavailable
-                statusLabel.setText("Warning: Using local calculation (remote service unavailable)");
-                return addMatricesLocally(a, b);
+                // No fallback to local calculation
+                showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
+                statusLabel.setText("Error: Remote server unavailable. Please start the server.");
+                return null;
             }
         } catch (Exception e) {
             showAlert("Remote Calculation Error", "Error during remote addition: " + e.getMessage());
-            statusLabel.setText("Error during remote calculation. Using local method.");
+            statusLabel.setText("Error during remote calculation: " + e.getMessage());
             e.printStackTrace();
-            return addMatricesLocally(a, b);
+            return null;
         }
-    }
-
-    // Local fallback method
-    private double[][] addMatricesLocally(double[][] a, double[][] b) {
-        int rows = a.length;
-        int cols = a[0].length;
-        double[][] result = new double[rows][cols];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                result[i][j] = a[i][j] + b[i][j];
-            }
-        }
-        return result;
     }
 
     private double[][] subtractMatrices(double[][] a, double[][] b) {
@@ -280,30 +280,17 @@ public class MatrixCalculatorController {
                 statusLabel.setText("Sending matrices to remote server for subtraction...");
                 return remote.subtractMatrices(a, b);
             } else {
-                // Fallback to local calculation if remote service is unavailable
-                statusLabel.setText("Warning: Using local calculation (remote service unavailable)");
-                return subtractMatricesLocally(a, b);
+                // No fallback to local calculation
+                showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
+                statusLabel.setText("Error: Remote server unavailable. Please start the server.");
+                return null;
             }
         } catch (Exception e) {
             showAlert("Remote Calculation Error", "Error during remote subtraction: " + e.getMessage());
-            statusLabel.setText("Error during remote calculation. Using local method.");
+            statusLabel.setText("Error during remote calculation: " + e.getMessage());
             e.printStackTrace();
-            return subtractMatricesLocally(a, b);
+            return null;
         }
-    }
-
-    // Local fallback method
-    private double[][] subtractMatricesLocally(double[][] a, double[][] b) {
-        int rows = a.length;
-        int cols = a[0].length;
-        double[][] result = new double[rows][cols];
-
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                result[i][j] = a[i][j] - b[i][j];
-            }
-        }
-        return result;
     }
 
     private double[][] multiplyMatrices(double[][] a, double[][] b) {
@@ -313,35 +300,17 @@ public class MatrixCalculatorController {
                 statusLabel.setText("Sending matrices to remote server for multiplication...");
                 return remote.multiplyMatrices(a, b);
             } else {
-                // Fallback to local calculation if remote service is unavailable
-                statusLabel.setText("Warning: Using local calculation (remote service unavailable)");
-                return multiplyMatricesLocally(a, b);
+                // No fallback to local calculation
+                showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
+                statusLabel.setText("Error: Remote server unavailable. Please start the server.");
+                return null;
             }
         } catch (Exception e) {
             showAlert("Remote Calculation Error", "Error during remote multiplication: " + e.getMessage());
-            statusLabel.setText("Error during remote calculation. Using local method.");
+            statusLabel.setText("Error during remote calculation: " + e.getMessage());
             e.printStackTrace();
-            return multiplyMatricesLocally(a, b);
+            return null;
         }
-    }
-
-    // Local fallback method
-    private double[][] multiplyMatricesLocally(double[][] a, double[][] b) {
-        int rowsA = a.length;
-        int colsA = a[0].length;
-        int colsB = b[0].length;
-
-        double[][] result = new double[rowsA][colsB];
-
-        for (int i = 0; i < rowsA; i++) {
-            for (int j = 0; j < colsB; j++) {
-                result[i][j] = 0;
-                for (int k = 0; k < colsA; k++) {
-                    result[i][j] += a[i][k] * b[k][j];
-                }
-            }
-        }
-        return result;
     }
 
     // Determinant calculation using remote service
@@ -352,31 +321,17 @@ public class MatrixCalculatorController {
                 statusLabel.setText("Sending matrix to remote server for determinant calculation...");
                 return remote.calculateDeterminant(matrix);
             } else {
-                // Fallback to local calculation if remote service is unavailable
-                statusLabel.setText("Warning: Using local calculation (remote service unavailable)");
-                return calculateDeterminantLocally(matrix);
+                // No fallback to local calculation
+                showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
+                statusLabel.setText("Error: Remote server unavailable. Please start the server.");
+                return Double.NaN; // Return NaN to indicate error
             }
         } catch (Exception e) {
             showAlert("Remote Calculation Error", "Error during remote determinant calculation: " + e.getMessage());
-            statusLabel.setText("Error during remote calculation. Using local method.");
+            statusLabel.setText("Error during remote calculation: " + e.getMessage());
             e.printStackTrace();
-            return calculateDeterminantLocally(matrix);
+            return Double.NaN; // Return NaN to indicate error
         }
-    }
-
-    // Local fallback method
-    private double calculateDeterminantLocally(double[][] matrix) {
-        int size = matrix.length;
-
-        if (size == 1) {
-            return matrix[0][0];
-        }
-        if (size == 2) {
-            return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
-        }
-        // For larger matrices, we'd implement a more efficient algorithm
-        // but this is simplified for demonstration
-        return 0;
     }
 
     // Inverse calculation using remote service
@@ -387,35 +342,17 @@ public class MatrixCalculatorController {
                 statusLabel.setText("Sending matrix to remote server for inverse calculation...");
                 return remote.calculateInverse(matrix);
             } else {
-                // Fallback to local calculation if remote service is unavailable
-                statusLabel.setText("Warning: Using local calculation (remote service unavailable)");
-                return calculateInverseLocally(matrix);
+                // No fallback to local calculation
+                showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
+                statusLabel.setText("Error: Remote server unavailable. Please start the server.");
+                return null;
             }
         } catch (Exception e) {
             showAlert("Remote Calculation Error", "Error during remote inverse calculation: " + e.getMessage());
-            statusLabel.setText("Error during remote calculation. Using local method.");
+            statusLabel.setText("Error during remote calculation: " + e.getMessage());
             e.printStackTrace();
-            return calculateInverseLocally(matrix);
+            return null;
         }
-    }
-
-    // Local fallback method
-    private double[][] calculateInverseLocally(double[][] matrix) {
-        int size = matrix.length;
-
-        // In a real app, you'd implement a proper matrix inversion algorithm
-        // This is just a placeholder
-        double det = calculateDeterminantLocally(matrix);
-        if (Math.abs(det) < 1e-10) {
-            return null; // Matrix is singular
-        }
-
-        // Return identity matrix as placeholder
-        double[][] result = new double[size][size];
-        for (int i = 0; i < size; i++) {
-            result[i][i] = 1;
-        }
-        return result;
     }
 
     private double[][] transposeMatrix(double[][] matrix) {
@@ -425,30 +362,17 @@ public class MatrixCalculatorController {
                 statusLabel.setText("Sending matrix to remote server for transpose...");
                 return remote.transposeMatrix(matrix);
             } else {
-                // Fallback to local calculation if remote service is unavailable
-                statusLabel.setText("Warning: Using local calculation (remote service unavailable)");
-                return transposeMatrixLocally(matrix);
+                // No fallback to local calculation
+                showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
+                statusLabel.setText("Error: Remote server unavailable. Please start the server.");
+                return null;
             }
         } catch (Exception e) {
             showAlert("Remote Calculation Error", "Error during remote transpose: " + e.getMessage());
-            statusLabel.setText("Error during remote calculation. Using local method.");
+            statusLabel.setText("Error during remote calculation: " + e.getMessage());
             e.printStackTrace();
-            return transposeMatrixLocally(matrix);
+            return null;
         }
-    }
-
-    // Local fallback method
-    private double[][] transposeMatrixLocally(double[][] matrix) {
-        int rows = matrix.length;
-        int cols = matrix[0].length;
-
-        double[][] result = new double[cols][rows];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                result[j][i] = matrix[i][j];
-            }
-        }
-        return result;
     }
 
     @FXML

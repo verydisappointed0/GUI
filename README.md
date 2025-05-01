@@ -26,7 +26,12 @@ The application follows a client-server architecture:
 
 ### Starting the Server
 
-1. First, start the RMI server:
+1. First, start the RMI server using the provided batch file:
+   ```
+   start_server.bat
+   ```
+
+   Alternatively, you can start it directly with Java:
    ```
    java -cp <classpath> com.matrixcalculator.rmi.MatrixServer
    ```
@@ -40,7 +45,12 @@ The application follows a client-server architecture:
 
 ### Starting the Client
 
-2. After the server is running, start the client application:
+2. After the server is running, start the client application using the provided batch file:
+   ```
+   start_client.bat
+   ```
+
+   Alternatively, you can start it directly with Java:
    ```
    java -cp <classpath> com.matrixcalculator.view.MatrixCalculatorApp
    ```
@@ -54,17 +64,17 @@ The application follows a client-server architecture:
 5. Click "Calculate" to perform the operation
 6. The result will be displayed in the result section
 
-The status bar at the bottom of the application will show whether the calculation is being performed locally or remotely.
+The status bar at the bottom of the application will show the status of the calculation and any error messages if the server is unavailable.
 
-## Fallback Mechanism
+## Server Dependency
 
-If the remote server is unavailable, the application will automatically fall back to local calculations. This ensures that the application remains functional even if the server is down or unreachable.
+The application requires the remote server to be running to perform calculations. If the server is unavailable, the application will display an error message and will not be able to perform any calculations. This design ensures that all calculations are performed on the server, which can be more powerful and efficient than the client machine.
 
 ## Implementation Details
 
 - The RMI interface `MatrixOperations` defines the operations that can be performed remotely.
 - The server implementation `MatrixOperationsImpl` provides the actual implementation of these operations.
-- The client controller `MatrixCalculatorController` attempts to use the remote service first, and falls back to local calculations if necessary.
+- The client controller `MatrixCalculatorController` sends all calculation requests to the remote server.
 
 ## Troubleshooting
 
