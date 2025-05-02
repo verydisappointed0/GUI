@@ -4,65 +4,71 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
- * Remote interface for matrix operations.
- * This interface defines all matrix operations that can be performed remotely.
+ * Interface for remote matrix operations.
+ * 
+ * This defines the operations our server will provide.
+ * All methods throw RemoteException because that's how RMI works.
+ * 
+ * @author John
+ * @version 1.2
  */
 public interface MatrixOperations extends Remote {
-    
+
     /**
-     * Adds two matrices.
+     * Adds two matrices together
      * 
      * @param a First matrix
      * @param b Second matrix
-     * @return Result of addition
-     * @throws RemoteException If a remote communication error occurs
+     * @return The sum matrix
+     * @throws RemoteException if RMI stuff breaks
      */
     double[][] addMatrices(double[][] a, double[][] b) throws RemoteException;
-    
+
     /**
-     * Subtracts second matrix from the first.
+     * Subtracts matrix b from matrix a
      * 
-     * @param a First matrix
-     * @param b Second matrix
-     * @return Result of subtraction
-     * @throws RemoteException If a remote communication error occurs
+     * @param a Matrix to subtract from
+     * @param b Matrix to subtract
+     * @return Difference of matrices
+     * @throws RemoteException if network fails
      */
     double[][] subtractMatrices(double[][] a, double[][] b) throws RemoteException;
-    
+
     /**
-     * Multiplies two matrices.
+     * Matrix multiplication (not element-wise!)
      * 
      * @param a First matrix
      * @param b Second matrix
-     * @return Result of multiplication
-     * @throws RemoteException If a remote communication error occurs
+     * @return Product matrix
+     * @throws RemoteException if server dies
      */
     double[][] multiplyMatrices(double[][] a, double[][] b) throws RemoteException;
-    
+
     /**
-     * Calculates the determinant of a matrix.
+     * Finds the determinant
+     * Note: Only works for 1x1 and 2x2 matrices right now!
      * 
-     * @param matrix Input matrix
-     * @return Determinant value
-     * @throws RemoteException If a remote communication error occurs
+     * @param matrix Square matrix to find determinant for
+     * @return the determinant value
+     * @throws RemoteException on communication error
      */
     double calculateDeterminant(double[][] matrix) throws RemoteException;
-    
+
     /**
-     * Calculates the inverse of a matrix.
+     * Calculates matrix inverse
      * 
-     * @param matrix Input matrix
-     * @return Inverse matrix or null if matrix is singular
-     * @throws RemoteException If a remote communication error occurs
+     * @param matrix Matrix to invert (must be square)
+     * @return Inverted matrix or null if not invertible
+     * @throws RemoteException when RMI fails
      */
     double[][] calculateInverse(double[][] matrix) throws RemoteException;
-    
+
     /**
-     * Transposes a matrix.
+     * Flips the matrix along its diagonal
      * 
-     * @param matrix Input matrix
+     * @param matrix Matrix to transpose
      * @return Transposed matrix
-     * @throws RemoteException If a remote communication error occurs
+     * @throws RemoteException on server error
      */
     double[][] transposeMatrix(double[][] matrix) throws RemoteException;
 }

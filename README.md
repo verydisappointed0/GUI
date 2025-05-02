@@ -1,85 +1,87 @@
 # Matrix Calculator with RMI
 
-This project implements a matrix calculator application that uses Java RMI (Remote Method Invocation) to offload matrix operations to a remote server.
+Hey there! This is my matrix calculator project that I built for my OOP class. It uses Java RMI to do all the heavy lifting on a separate server - pretty cool, right?
 
-## Overview
+## What it does
 
-The Matrix Calculator allows users to perform various matrix operations:
-- Addition
-- Subtraction
-- Multiplication
-- Determinant calculation
-- Matrix inversion
-- Transpose
+This calculator lets you play around with matrices and do stuff like:
+- Adding matrices together
+- Subtracting one matrix from another
+- Matrix multiplication (the tricky one!)
+- Finding determinants
+- Inverting matrices (when possible)
+- Transposing matrices
 
-Instead of performing these calculations locally, the application sends the matrices to a remote server, which performs the calculations and returns the results.
+The neat part is that instead of making your poor laptop do all the work, it sends everything to a server that handles the calculations and sends back the results.
 
-## Architecture
+## How it's built
 
-The application follows a client-server architecture:
+I went with a client-server setup:
 
-1. **Client**: The JavaFX application that provides the user interface for creating matrices and requesting operations.
-2. **Server**: A standalone Java application that hosts the matrix operation service.
-3. **RMI**: The communication mechanism that allows the client to invoke methods on the server.
+1. **Client**: A JavaFX app with a (hopefully) nice UI where you can create matrices and click buttons
+2. **Server**: A separate Java program that sits there waiting to do math for you
+3. **RMI**: The magic that lets them talk to each other
 
-## How to Run
+## Getting it running
 
-### Starting the Server
+### Fire up the server first
 
-1. First, start the RMI server using the provided batch file:
+1. The easiest way is to just double-click the batch file:
    ```
    start_server.bat
    ```
 
-   Alternatively, you can start it directly with Java:
+   Or if you're a command line person:
    ```
    java -cp <classpath> com.matrixcalculator.rmi.MatrixServer
    ```
 
-   You should see output indicating that the server has started and is ready to accept requests:
+   You should see something like:
    ```
    RMI registry created on port 1099
    MatrixOperations service bound to registry
    Server is ready to accept requests
    ```
 
-### Starting the Client
+### Then start the client
 
-2. After the server is running, start the client application using the provided batch file:
+2. Once the server's running, start the actual calculator:
    ```
    start_client.bat
    ```
 
-   Alternatively, you can start it directly with Java:
+   Or manually:
    ```
    java -cp <classpath> com.matrixcalculator.view.MatrixCalculatorApp
    ```
 
-## Usage
+## How to use it
 
-1. Create Matrix A by setting the dimensions and clicking "Create Matrix"
-2. Create Matrix B by setting the dimensions and clicking "Create Matrix"
-3. Enter values in the matrix cells
-4. Select an operation from the dropdown
-5. Click "Calculate" to perform the operation
-6. The result will be displayed in the result section
+1. Set up Matrix A by picking dimensions and hitting "Create Matrix"
+2. Do the same for Matrix B
+3. Type in your values (or just use the defaults)
+4. Pick an operation from the dropdown
+5. Hit "Calculate" and watch the magic happen
+6. Your answer appears in the result area!
 
-The status bar at the bottom of the application will show the status of the calculation and any error messages if the server is unavailable.
+There's a status bar at the bottom that'll let you know if something goes wrong.
 
-## Server Dependency
+## Important note!
 
-The application requires the remote server to be running to perform calculations. If the server is unavailable, the application will display an error message and will not be able to perform any calculations. This design ensures that all calculations are performed on the server, which can be more powerful and efficient than the client machine.
+The calculator NEEDS the server running to work! If the server's not running, you'll get error messages and nothing will calculate. I designed it this way on purpose to practice with RMI.
 
-## Implementation Details
+## Under the hood
 
-- The RMI interface `MatrixOperations` defines the operations that can be performed remotely.
-- The server implementation `MatrixOperationsImpl` provides the actual implementation of these operations.
-- The client controller `MatrixCalculatorController` sends all calculation requests to the remote server.
+- I created an interface called `MatrixOperations` that defines all the operations
+- The server implements these operations in `MatrixOperationsImpl`
+- The client's `MatrixCalculatorController` handles the UI and talks to the server
 
 ## Troubleshooting
 
-If you encounter issues with the RMI connection:
+If things aren't working:
 
-1. Ensure the server is running before starting the client
-2. Check that no firewall is blocking the RMI port (default: 1099)
-3. If running on different machines, ensure the RMI_HOST in the client is set to the correct server IP address
+1. Make sure you started the server BEFORE the client
+2. Check if your firewall is blocking port 1099
+3. If you're trying to run this across different computers, you'll need to change the RMI_HOST in the client code
+
+Let me know if you find any bugs! This was a fun project to build.

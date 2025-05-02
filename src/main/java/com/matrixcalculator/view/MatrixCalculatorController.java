@@ -388,16 +388,25 @@ public class MatrixCalculatorController {
         statusLabel.setText("All matrices cleared.");
     }
 
+    // I'll implement these features when I have time
+
     @FXML
     public void saveMatrix() {
-        // Placeholder for save functionality
-        statusLabel.setText("Save functionality not implemented yet.");
+        // TODO: Add file chooser and matrix serialization
+        statusLabel.setText("Sorry! Save feature coming in the next version!");
+        showAlert("Not Implemented", "I haven't had time to implement this yet... Check back in v2.0!");
     }
 
     @FXML
     public void loadMatrix() {
-        // Placeholder for load functionality
-        statusLabel.setText("Load functionality not implemented yet.");
+        // This is on my to-do list for next week
+        System.out.println("User tried to load a matrix - need to implement this!");
+        statusLabel.setText("Loading matrices from files isn't working yet :(");
+
+        // Uncomment this when implemented:
+        // FileChooser fileChooser = new FileChooser();
+        // fileChooser.setTitle("Open Matrix File");
+        // File file = fileChooser.showOpenDialog(null);
     }
 
     private void showAlert(String title, String message) {
