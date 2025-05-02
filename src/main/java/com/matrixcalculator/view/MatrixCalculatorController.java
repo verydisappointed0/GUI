@@ -33,11 +33,8 @@ public class MatrixCalculatorController {
     private List<List<TextField>> matrixBFields = new ArrayList<>();
     private List<List<TextField>> resultFields = new ArrayList<>();
 
-    // RMI server configuration
     private static final String RMI_HOST = "localhost";
     private static final int RMI_PORT = 1099;
-
-    // Get the remote matrix operations service
     private MatrixOperations getRemoteMatrixOperations() {
         try {
             Registry registry = LocateRegistry.getRegistry(RMI_HOST, RMI_PORT);
@@ -52,7 +49,6 @@ public class MatrixCalculatorController {
 
     @FXML
     public void initialize() {
-        // Setup operation options
         operationComboBox.getItems().addAll(
             "Addition (A + B)",
             "Subtraction (A - B)",
@@ -62,8 +58,6 @@ public class MatrixCalculatorController {
             "Transpose"
         );
         operationComboBox.setValue("Addition (A + B)");
-
-        // Setup spinners
         SpinnerValueFactory<Integer> valueFactoryRowsA = 
             new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10, 3);
         SpinnerValueFactory<Integer> valueFactoryColsA = 
@@ -96,11 +90,8 @@ public class MatrixCalculatorController {
     }
 
     private void createMatrix(GridPane grid, List<List<TextField>> fields, int rows, int cols) {
-        // Clear existing grid
         grid.getChildren().clear();
         fields.clear();
-
-        // Create new input fields
         for (int i = 0; i < rows; i++) {
             fields.add(new ArrayList<>());
 
@@ -121,7 +112,6 @@ public class MatrixCalculatorController {
             return;
         }
 
-        // Check if remote service is available
         try {
             MatrixOperations remote = getRemoteMatrixOperations();
             if (remote != null) {
@@ -142,8 +132,6 @@ public class MatrixCalculatorController {
         int colsA = matrixAFields.get(0).size();
         int rowsB = matrixBFields.size();
         int colsB = matrixBFields.get(0).size();
-
-        // Parse input matrices
         double[][] matrixA = new double[rowsA][colsA];
         double[][] matrixB = new double[rowsB][colsB];
 
@@ -167,7 +155,6 @@ public class MatrixCalculatorController {
             return;
         }
 
-        // Perform calculation based on selected operation
         double[][] result = null;
 
         switch (operation) {
@@ -199,7 +186,6 @@ public class MatrixCalculatorController {
                 }
                 double det = calculateDeterminant(matrixA);
                 if (Double.isNaN(det)) {
-                    // Error already shown by calculateDeterminant
                     return;
                 }
                 showAlert("Determinant Result", "Determinant of Matrix A = " + det);
@@ -212,7 +198,6 @@ public class MatrixCalculatorController {
                 }
                 result = calculateInverse(matrixA);
                 if (result == null) {
-                    // Error message already shown by calculateInverse
                     return;
                 }
                 break;
@@ -221,18 +206,15 @@ public class MatrixCalculatorController {
                 break;
         }
 
-        // Display result
         if (result != null) {
             displayResult(result);
             statusLabel.setText("Calculation completed successfully.");
         } else {
-            // Error message already shown by the operation method
             statusLabel.setText("Calculation failed. Please check if the server is running.");
         }
     }
 
     private void displayResult(double[][] result) {
-        // Clear existing result grid
         resultMatrixGrid.getChildren().clear();
         resultFields.clear();
 
@@ -260,7 +242,6 @@ public class MatrixCalculatorController {
                 statusLabel.setText("Sending matrices to remote server for addition...");
                 return remote.addMatrices(a, b);
             } else {
-                // No fallback to local calculation
                 showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
                 statusLabel.setText("Error: Remote server unavailable. Please start the server.");
                 return null;
@@ -280,7 +261,6 @@ public class MatrixCalculatorController {
                 statusLabel.setText("Sending matrices to remote server for subtraction...");
                 return remote.subtractMatrices(a, b);
             } else {
-                // No fallback to local calculation
                 showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
                 statusLabel.setText("Error: Remote server unavailable. Please start the server.");
                 return null;
@@ -300,7 +280,6 @@ public class MatrixCalculatorController {
                 statusLabel.setText("Sending matrices to remote server for multiplication...");
                 return remote.multiplyMatrices(a, b);
             } else {
-                // No fallback to local calculation
                 showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
                 statusLabel.setText("Error: Remote server unavailable. Please start the server.");
                 return null;
@@ -313,7 +292,6 @@ public class MatrixCalculatorController {
         }
     }
 
-    // Determinant calculation using remote service
     private double calculateDeterminant(double[][] matrix) {
         try {
             MatrixOperations remote = getRemoteMatrixOperations();
@@ -321,20 +299,18 @@ public class MatrixCalculatorController {
                 statusLabel.setText("Sending matrix to remote server for determinant calculation...");
                 return remote.calculateDeterminant(matrix);
             } else {
-                // No fallback to local calculation
                 showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
                 statusLabel.setText("Error: Remote server unavailable. Please start the server.");
-                return Double.NaN; // Return NaN to indicate error
+                return Double.NaN;
             }
         } catch (Exception e) {
             showAlert("Remote Calculation Error", "Error during remote determinant calculation: " + e.getMessage());
             statusLabel.setText("Error during remote calculation: " + e.getMessage());
             e.printStackTrace();
-            return Double.NaN; // Return NaN to indicate error
+            return Double.NaN;
         }
     }
 
-    // Inverse calculation using remote service
     private double[][] calculateInverse(double[][] matrix) {
         try {
             MatrixOperations remote = getRemoteMatrixOperations();
@@ -342,7 +318,6 @@ public class MatrixCalculatorController {
                 statusLabel.setText("Sending matrix to remote server for inverse calculation...");
                 return remote.calculateInverse(matrix);
             } else {
-                // No fallback to local calculation
                 showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
                 statusLabel.setText("Error: Remote server unavailable. Please start the server.");
                 return null;
@@ -362,7 +337,6 @@ public class MatrixCalculatorController {
                 statusLabel.setText("Sending matrix to remote server for transpose...");
                 return remote.transposeMatrix(matrix);
             } else {
-                // No fallback to local calculation
                 showAlert("Server Unavailable", "The remote server is unavailable. Please start the server and try again.");
                 statusLabel.setText("Error: Remote server unavailable. Please start the server.");
                 return null;
@@ -390,14 +364,14 @@ public class MatrixCalculatorController {
 
     @FXML
     public void saveMatrix() {
-        // Placeholder for save functionality
-        statusLabel.setText("Save functionality not implemented yet.");
+        statusLabel.setText("Sorry! Save feature coming in the next version!");
+        showAlert("Not Implemented", "I haven't had time to implement this yet... Check back in v2.0!");
     }
 
     @FXML
     public void loadMatrix() {
-        // Placeholder for load functionality
-        statusLabel.setText("Load functionality not implemented yet.");
+        System.out.println("User tried to load a matrix - need to implement this!");
+        statusLabel.setText("Loading matrices from files isn't working yet :(");
     }
 
     private void showAlert(String title, String message) {
